@@ -6,6 +6,7 @@ It writes a single text file to an S3/MinIO bucket:
 
 - default key: `hello-process-test/hello.txt`
 - default content: `hello world`
+- plus an environment-variable report showing whether the expected inputs exist
 
 ## Files
 
@@ -82,4 +83,13 @@ with content similar to:
 ```text
 hello world
 created_at_utc=2026-03-13T12:34:56.000000+00:00
+environment_report:
+AWS_BUCKET_NAME: exists=yes; value=project-moi-ai
+AWS_S3_ENDPOINT: exists=yes; value=minio.dive.edito.eu
+AWS_ACCESS_KEY_ID: exists=yes; value=ABCD...WXYZ
+AWS_SECRET_ACCESS_KEY: exists=yes; value=ABCD...WXYZ
+AWS_SESSION_TOKEN: exists=yes; value=ABCD...WXYZ
+OUTPUT_PREFIX: exists=yes; value=hello-process-test
+OUTPUT_FILE_NAME: exists=yes; value=hello.txt
+HELLO_MESSAGE: exists=yes; value=hello world
 ```

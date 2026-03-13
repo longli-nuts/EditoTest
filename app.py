@@ -11,6 +11,36 @@ def _required_env(name: str) -> str:
     return value
 
 
+def _mask_value(name: str, value: str | None) -> str:
+    if not value:
+        return "<missing>"
+    if name in {"AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN"}:
+        if len(value) <= 8:
+            return "*" * len(value)
+        return f"{value[:4]}...{value[-4:]}"
+    return value
+
+
+def _env_report_lines() -> list[str]:
+    env_names = [
+        "AWS_BUCKET_NAME",
+        "AWS_S3_ENDPOINT",
+        "AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY",
+        "AWS_SESSION_TOKEN",
+        "OUTPUT_PREFIX",
+        "OUTPUT_FILE_NAME",
+        "HELLO_MESSAGE",
+    ]
+
+    lines = ["environment_report:"]
+    for name in env_names:
+        value = os.environ.get(name)
+        exists = "yes" if value else "no"
+        lines.append(f"{name}: exists={exists}; value={_mask_value(name, value)}")
+    return lines
+
+
 def main() -> None:
     bucket_name = _required_env("AWS_BUCKET_NAME")
     endpoint_host = _required_env("AWS_S3_ENDPOINT")
@@ -38,7 +68,8 @@ def main() -> None:
     )
 
     object_key = f"{output_prefix}/{file_name}" if output_prefix else file_name
-    body = f"{message}\ncreated_at_utc={timestamp}\n"
+    report = "\n".join(_env_report_lines())
+    body = f"{message}\ncreated_at_utc={timestamp}\n{report}\n"
 
     s3_client.put_object(
         Bucket=bucket_name,
