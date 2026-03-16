@@ -1,4 +1,4 @@
-FROM mambaorg/micromamba:1.5.6-focal-cuda-12.1.1
+FROM mambaorg/micromamba:1.5.6-focal-cuda-11.8.0
 
 USER root
 
@@ -8,6 +8,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 USER $MAMBA_USER
+
+ENV CONDA_OVERRIDE_CUDA=11.8
 
 COPY --chown=$MAMBA_USER:$MAMBA_USER ./environment.yaml /tmp/env.yml
 RUN micromamba install -y -n base -f /tmp/env.yml && micromamba clean --all --yes
