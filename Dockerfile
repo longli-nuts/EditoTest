@@ -1,4 +1,4 @@
-FROM mambaorg/micromamba:1.5.6-focal-cuda-12.1.1
+FROM mambaorg/micromamba:1.5.6-focal-cuda-11.8.0
 
 USER root
 
@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 USER $MAMBA_USER
 
-COPY --chown=$MAMBA_USER:$MAMBA_USER ./environment.yml /tmp/env.yml
+COPY --chown=$MAMBA_USER:$MAMBA_USER ./environment.yaml /tmp/env.yml
 RUN micromamba install -y -n base -f /tmp/env.yml && micromamba clean --all --yes
 
 # Install aerobulk manually: not on PyPI, broken build with modern setuptools.
