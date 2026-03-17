@@ -105,20 +105,6 @@ def main():
         output_path=str(Path(LOCAL_WORK_DIR) / "output"),
     )
 
-    print(f"\n{'=' * 60}")
-    print("Step 5/5 - Saving zarr.zip and uploading to S3")
-    print("=" * 60)
-
-    final_zarr = Path(LOCAL_WORK_DIR) / zarr_filename
-    import zarr
-    store = zarr.ZipStore(str(final_zarr), mode="w")
-    forecast_ds.to_zarr(store, consolidated=True)
-    store.close()
-    size_mb = final_zarr.stat().st_size / 1e6
-    print(f"[OK] Zarr zip saved: {final_zarr} ({size_mb:.1f} MB)")
-
-    upload_with_retry(bucket_name, str(final_zarr), s3_zarr_key)
-
     print("Generating thumbnails...")
     thumb_prefix = f"{s3_prefix}/{FORECAST_DATE}/thumbnails"
     thumbnail_urls = {
@@ -135,6 +121,20 @@ def main():
         print("[OK] Thumbnails uploaded")
     except Exception as e:
         print(f"[WARNING] Thumbnail generation failed (non-fatal): {e}")
+
+    print(f"\n{'=' * 60}")
+    print("Step 5/5 - Saving zarr.zip and uploading to S3")
+    print("=" * 60)
+
+    final_zarr = Path(LOCAL_WORK_DIR) / zarr_filename
+    import zarr
+    store = zarr.ZipStore(str(final_zarr), mode="w")
+    forecast_ds.to_zarr(store, consolidated=True)
+    store.close()
+    size_mb = final_zarr.stat().st_size / 1e6
+    print(f"[OK] Zarr zip saved: {final_zarr} ({size_mb:.1f} MB)")
+
+    upload_with_retry(bucket_name, str(final_zarr), s3_zarr_key)
 
     forecast_ds.close()
 
